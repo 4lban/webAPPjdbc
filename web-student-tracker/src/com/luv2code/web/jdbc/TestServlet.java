@@ -29,7 +29,7 @@ public class TestServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
+		System.out.println("doGet(...)");
 		// Step 1: Set up the printwriter
 		PrintWriter out = response.getWriter();
 		response.setContentType("text/plain");

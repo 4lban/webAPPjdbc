@@ -3,6 +3,7 @@ package com.luv2code.web.jdbc;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -107,6 +108,90 @@ public class StudentDbUtil {
 			close(myConn, myStmt, null);
 		}
 		
+	}
+
+	public Student getStudent(String theStudentId) throws Exception {
+		
+		Student theStudent = null;
+		
+		Connection myConn = null;
+		PreparedStatement myStmt = null;
+		ResultSet myRs = null;
+		int studentId;
+		
+		try {
+			// convert student id to int
+			studentId = Integer.parseInt(theStudentId);
+			
+			// get connection to database
+			myConn = dataSource.getConnection();
+			
+			// create sql to get selected student
+			String sql = "select * from student where id=?";
+			
+			// create prepared statement
+			myStmt = myConn.prepareStatement(sql);
+			
+			// set params
+			myStmt.setString(1, theStudentId);
+			
+			// execute statement
+			myRs = myStmt.executeQuery();
+			
+			// retrieve data
+			if(myRs.next()) {
+				String firstName = myRs.getString("first_name");
+				String lastName = myRs.getString("last_name");
+				String email = myRs.getString("email");
+				
+				// use the studentId during construction
+				theStudent = new Student(studentId, firstName, lastName, email);
+			}
+			else {
+				throw new Exception("Could not find student id: " + studentId);
+			}
+			
+			return theStudent;
+		} 
+		finally {
+			// close up JDBC objects
+			close(myConn, myStmt, myRs);
+		}
+		
+	}
+
+	public void updateStudent(Student theStudent) throws Exception {
+		
+		Connection myConn = null;
+		PreparedStatement myStmt = null;	// because of ? data to insert
+		
+		try {
+			// get db connection
+			myConn = dataSource.getConnection();
+			
+			// create sql for insert
+			String sql = "update student "
+					+ "set first_name=?, last_name=?, email=? "
+					+ "where id=?";
+			
+			// prepare statement
+			myStmt = myConn.prepareStatement(sql);
+			
+			// set the param values for the student
+			myStmt.setString(1, theStudent.getFirstName());
+			myStmt.setString(2, theStudent.getLastName());
+			myStmt.setString(3, theStudent.getEmail());
+			myStmt.setInt(4, theStudent.getId());
+			
+			// execute sql insert
+			myStmt.execute();
+			
+		} 
+		finally {
+			// clean up JDBC objects
+			close(myConn, myStmt, null);
+		}
+				
 	}
 	
 }

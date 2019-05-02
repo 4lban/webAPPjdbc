@@ -3,7 +3,6 @@ package com.luv2code.web.jdbc;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -192,6 +191,37 @@ public class StudentDbUtil {
 			close(myConn, myStmt, null);
 		}
 				
+	}
+
+	public void deleteStudent(String theStudentId) throws Exception {
+		
+		Connection myConn = null;
+		PreparedStatement myStmt = null;	// because of ? data to insert
+		
+		try {
+			// convert student id to int
+			int studentId = Integer.parseInt(theStudentId);
+			
+			// get connection to database
+			myConn = dataSource.getConnection();
+			
+			// create sql to delete student 
+			String sql = "delete from student where id=?";
+			
+			// prepare statement
+			myStmt = myConn.prepareStatement(sql);
+			
+			// set the param values for the student
+			myStmt.setInt(1, studentId);
+			
+			// execute sql statement
+			myStmt.execute();
+			
+		} 
+		finally {
+			// clean up JDBC objects
+			close(myConn, myStmt, null);
+		}
 	}
 	
 }
